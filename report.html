@@ -81,11 +81,19 @@
 </select>
 
 
-<label>Description</label>
-<textarea id="description" placeholder="Describe the situation..." class="report-textarea"></textarea>
+<div class="form-group">
 
+<label for="description">Description</label>
 
-<button onclick="submitReport()">Submit Report</button>
+<textarea
+id="description"
+placeholder="Describe the situation..."
+class="report-textarea"
+></textarea>
+
+</div>
+
+<button class="primary-btn">Submit Report</button>
 
 <p id="status" style="margin-top:10px;"></p>
 
