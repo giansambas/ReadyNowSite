@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - ReadyNow</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar" id="sidebar">
+
+<div class="sidebar-header">
+<span class="sidebar-logo">ReadyNow</span>
+<button class="close-sidebar" onclick="toggleSidebar()">✕</button>
+</div>
+
+<ul class="sidebar-menu">
+
+<li><a href="dashboard.html">Dashboard</a></li>
+<li><a href="selection.html">Select Location</a></li>
+<li><a href="map.html">Evacuation Information</a></li>
+<li><a href="report.html">Report Disaster</a></li>
+<li><a href="about.html">About ReadyNow</a></li>
+
+</ul>
+
+</div>
+
+
+<!-- HEADER -->
+
+<header class="main-header">
+
+<div class="header-container">
+
+<button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+<div class="logo">ReadyNow</div>
+
+<nav>
+<a href="index.html">Home</a>
+<a href="about.html">About</a>
+</nav>
+
+</div>
+
+</header>
+
+
+<!-- MAIN CONTENT -->
+
+<main class="page-container">
+
+<section class="hero">
+
+<h1>Dashboard</h1>
+<p>Start by selecting your location to view evacuation information.</p>
+
+</section>
+
+
+<div class="dashboard-grid">
+
+<!-- LEFT SIDE -->
+
+<div class="dashboard-left">
+
+<!-- SELECT LOCATION -->
+
+<div class="card" style="text-align:center">
+
+<h3>Select Your Location</h3>
+
+<p>Choose your district and barangay to access evacuation maps and facilities.</p>
+
+<br>
+
+<a href="selection.html">
+<button style="font-size:16px;padding:14px 28px">
+Select Location
+</button>
+</a>
+
+</div>
+
+
+<!-- REPORT DISASTER -->
+
+<div class="card report-card">
+
+<h3>Report a Disaster</h3>
+
+<p>
+Help the community by reporting floods, fires, landslides, or other emergencies in your area.
+</p>
+
+<a href="report.html">
+<button class="primary-btn">Submit Disaster Report</button>
+</a>
+
+</div>
+
+
+<!-- NEWS -->
+
+<div class="card">
+
+<h3>Latest Disaster News</h3>
+
+<div id="newsList" class="news-grid">
+Loading latest disaster news...
+</div>
+
+</div>
+
+</div>
+
+
+<!-- RIGHT SIDE -->
+
+<div class="dashboard-right">
+
+<div class="card">
+
+<h3>Community Disaster Reports</h3>
+
+<div id="reports"></div>
+
+</div>
+
+</div>
+
+
+</div>
+
+</main>
+
+<footer>
+<p>ReadyNow © 2026</p>
+</footer>
+
+
+
+<script>
+
+/* SIDEBAR TOGGLE */
+
+function toggleSidebar(){
+document.getElementById("sidebar").classList.toggle("open");
+}
+
+
+/* CLOSE SIDEBAR WHEN CLICKING OUTSIDE */
+
+document.addEventListener("click",function(e){
+
+const sidebar = document.getElementById("sidebar");
+const menuBtn = document.querySelector(".menu-toggle");
+
+if(
+sidebar.classList.contains("open") &&
+!sidebar.contains(e.target) &&
+!menuBtn.contains(e.target)
+){
+sidebar.classList.remove("open");
+}
+
+});
+
+
+/* ================= NEWS SYSTEM ================= */
+
+
+/* Google News */
+
+async function loadGoogleNews(retry = 0){
+
+try{
+
+const res = await fetch(
+"https://api.allorigins.win/raw?url=" +
+encodeURIComponent("https://news.google.com/rss/search?q=philippines+disaster&hl=en-PH&gl=PH&ceid=PH:en")
+);
+
+const str = await res.text();
+
+const parser = new DOMParser();
+const xml = parser.parseFromString(str,"text/xml");
+
+const items = xml.querySelectorAll("item");
+
+displayNews(items);
+
+}
+catch(err){
+
+if(retry < 2){
+setTimeout(()=>loadGoogleNews(retry+1),2000);
+}else{
+loadReliefWebNews();
+}
+
+}
+
+}
+
+
+/* Backup News */
+
+function loadReliefWebNews(){
+fetch("https://api.reliefweb.int/v1/reports?appname=ready-now&limit=6&profile=full&sort[]=date:desc")
+.then(res=>res.json())
+.then(data=>{
+const newsList = document.getElementById("newsList");
+
+newsList.innerHTML="";
+
+data.data.forEach(article=>{
+
+const title = article.fields.title;
+const link = article.fields.url;
+
+const card = document.createElement("div");
+card.className="news-card";
+
+card.innerHTML=`
+
+<a href="${link}" target="_blank">
+
+<img src="https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?w=800" alt="news">
+
+<div class="news-content">
+
+<h4>${title}</h4>
+
+<p>ReliefWeb Disaster Report</p>
+
+</div>
+
+</a>
+
+`;
+
+newsList.appendChild(card);
+
+});
+
+})
+
+.catch(()=>{
+
+document.getElementById("newsList").innerHTML =
+"Unable to load disaster news.";
+
+});
+
+}
+
+
+/* DISPLAY NEWS */
+
+function displayNews(items){
+
+const newsList = document.getElementById("newsList");
+
+newsList.innerHTML="";
+
+items.forEach((item,index)=>{
+
+if(index>=6) return;
+
+const title = item.querySelector("title").textContent;
+const link = item.querySelector("link").textContent;
+const description = item.querySelector("description").textContent;
+
+let image="";
+
+const imgMatch = description.match(/<img.*?src="(.*?)"/);
+
+if(imgMatch){
+image = imgMatch[1];
+}else{
+image="https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?w=800";
+}
+
+const card = document.createElement("div");
+card.className="news-card";
+
+card.innerHTML=`
+
+<a href="${link}" target="_blank">
+
+<img src="${image}" alt="news">
+
+<div class="news-content">
+
+<h4>${title}</h4>
+
+<p>Click to read full article</p>
+
+</div>
+
+</a>
+
+`;
+
+newsList.appendChild(card);
+
+});
+
+}
+
+
+/* START NEWS */
+
+loadGoogleNews();
+
+async function loadReports(){
+
+const res = await fetch("/api/report");
+const data = await res.json();
+
+const container = document.getElementById("reports");
+
+container.innerHTML = "";
+
+/* show message if no reports */
+
+if(data.length === 0){
+
+container.innerHTML = `
+<p style="color:#777;">No community reports yet.</p>
+`;
+
+return;
+
+}
+
+data.reverse().forEach(r => {
+
+const div = document.createElement("div");
+
+/* NEW CARD STYLE */
+
+div.className="report-item";
+
+div.innerHTML = `
+<h4>${r.disaster}</h4>
+<p><strong>Location:</strong> ${r.location}</p>
+<p>${r.description}</p>
+<small>${r.time}</small>
+`;
+
+container.appendChild(div);
+
+});
+
+}
+
+loadReports();
+
+</script>
+
+
+</body>
+</html>

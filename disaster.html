@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Disaster Selection</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="main-content">
+
+<header class="main-header">
+
+<div class="header-container">
+
+<button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+<div class="logo">ReadyNow</div>
+
+<nav>
+<a href="index.html">Home</a>
+<a href="about.html">About</a>
+</nav>
+
+</div>
+
+</header>
+
+<main>
+  <h1>Disaster Selection</h1>
+
+  <p class="section">
+    Location: <strong>Quezon City</strong>
+  </p>
+
+  <div class="form-group">
+    <label>Select Disaster Type</label>
+    <select id="disaster">
+      <option value="">Choose a disaster</option>
+      <option value="typhoon">Typhoon (Bagyo)</option>
+      <option value="earthquake">Earthquake (Lindol)</option>
+      <option value="flood">Flood (Baha)</option>
+      <option value="fire">Fire (Sunog)</option>
+      <option value="landslide">Landslide (Pagguho ng Lupa)</option>
+    </select>
+  </div>
+
+  <button onclick="goToPreparedness()">Continue</button>
+</main>
+
+<footer>
+  <p>ReadyNow © 2026</p>
+</footer>
+
+<script>
+  function goToPreparedness() {
+    const disaster = document.getElementById("disaster").value;
+
+    if (!disaster) {
+      alert("Please select a disaster type.");
+      return;
+    }
+
+    window.location.href =
+      "preparedness.html?disaster=" + disaster;
+  }
+</script>
+
+</body>
+</html>

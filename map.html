@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evacuation Map – ReadyNow</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<div class="sidebar" id="sidebar">
+
+<div class="sidebar-header">
+<span class="sidebar-logo">ReadyNow</span>
+<button class="close-sidebar" onclick="toggleSidebar()">✕</button>
+</div>
+
+<ul class="sidebar-menu">
+<li><a href="dashboard.html">Dashboard</a></li>
+<li><a href="selection.html">Select Location</a></li>
+<li><a href="map.html">Evacuation Information</a></li>
+<li><a href="report.html">Report Disaster</a></li>
+<li><a href="about.html">About ReadyNow</a></li>
+</ul>
+
+</div>
+
+<header class="main-header">
+
+<div class="header-container">
+
+<button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+<div class="logo">ReadyNow</div>
+
+<nav>
+<a href="index.html">Home</a>
+<a href="about.html">About</a>
+</nav>
+
+</div>
+
+</header>
+
+<main class="page-container">
+
+<section class="hero">
+<h1>Evacuation Information</h1>
+<p>Stay informed. Stay prepared. Stay safe.</p>
+</section>
+
+<section class="info-grid">
+
+<!-- WEATHER CARD -->
+
+<div class="card">
+
+<h3>Current Weather</h3>
+
+<div id="weatherCard" class="weather-card">
+
+<div class="weather-top">
+
+<div>
+<h3 id="weatherCity">Quezon City</h3>
+<h1 id="weatherTemp">--°</h1>
+<p id="weatherDesc">Loading...</p>
+</div>
+
+<img id="weatherIcon" src="" alt="weather">
+
+</div>
+
+<div class="weather-extra">
+
+<span id="weatherHumidity"></span>
+<span id="weatherWind"></span>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- LOCATION -->
+
+<div class="card location-card">
+
+<h3>Selected Location</h3>
+
+<div class="location-item">
+<span class="location-icon">📍</span>
+<div>
+<p class="location-label">District</p>
+<p class="location-value" id="selectedDistrict"></p>
+</div>
+</div>
+
+<div class="location-item">
+<span class="location-icon">🏠</span>
+<div>
+<p class="location-label">Barangay</p>
+<p class="location-value" id="selectedBarangay"></p>
+</div>
+</div>
+
+</div>
+
+</section>
+
+
+<div class="map-layout">
+
+<div class="card map-container">
+
+<h3>Evacuation Map</h3>
+
+<iframe id="mapFrame"></iframe>
+
+</div>
+
+
+<div class="facility-panel card">
+
+<h3>Evacuation Facilities</h3>
+
+<div id="facilityList"></div>
+
+</div>
+
+</div>
+
+<div class="dashboard-return">
+
+<a href="dashboard.html">
+<button class="dashboard-btn">
+← Back to Dashboard
+</button>
+</a>
+
+</div>
+
+</main>
+
+
+<footer>
+<p>ReadyNow © 2026</p>
+</footer>
+
+
+<script>
+
+/* SIDEBAR */
+
+function toggleSidebar(){
+document.getElementById("sidebar").classList.toggle("open");
+}
+
+
+/* LOCATION */
+
+const params = new URLSearchParams(window.location.search);
+
+const barangay = params.get("barangay");
+const district = params.get("district");
+
+document.getElementById("selectedBarangay").innerText = barangay || "-";
+document.getElementById("selectedDistrict").innerText = district || "-";
+
+
+/* GOOGLE MAP */
+
+document.getElementById("mapFrame").src =
+`https://www.google.com/maps?q=${encodeURIComponent(barangay + ", Quezon City")}&output=embed`;
+
+
+/* WEATHER */
+
+fetch("https://api.openweathermap.org/data/2.5/weather?q=Quezon City,PH&units=metric&appid=585f6af2cbff1e00738777e8c9af0136")
+
+.then(res => res.json())
+
+.then(data => {
+
+if(data.main){
+
+document.getElementById("weatherTemp").innerText =
+Math.round(data.main.temp) + "°C";
+
+document.getElementById("weatherDesc").innerText =
+data.weather[0].description;
+
+document.getElementById("weatherHumidity").innerText =
+"Humidity: " + data.main.humidity + "%";
+
+document.getElementById("weatherWind").innerText =
+"Wind: " + data.wind.speed + " m/s";
+
+document.getElementById("weatherIcon").src =
+"https://openweathermap.org/img/wn/" + data.weather[0].icon + "@2x.png";
+
+}
+
+});
+
+const evacuationData = {
+
+/* ================= DISTRICT 1 ================= */
+
+"Alicia": [
+  "Brgy Alicia Hall – 3rd Floor",
+  "Bago Bantay Elementary School"
+],
+
+"Bagong Pag-asa": [
+  "Open Ground",
+  "Bagong Pag-asa Elementary School",
+  "Multipurpose Covered Court"
+],
+
+"Bahay Toro": [
+  "Bahay Toro Basketball Court",
+  "Basketball Court",
+  "Toro Hills Elementary School"
+],
+
+"Balingasa": [
+  "Barangay Hall Covered Court"
+],
+
+"Bungad": [
+  "Barangay Bungad Covered Court",
+  "Bungad Elementary School"
+],
+
+"Damar": [
+  "Basketball Covered Court",
+  "Multi-Purpose Hall",
+  "Function Room"
+],
+
+"Damayan": [
+  "Cong Calalay Elementary School",
+  "Minor Basilica of Saint Pedro Bautista"
+],
+
+"Del Monte": [
+  "Dalupan Elementary School",
+  "San Francisco Elementary School"
+],
+
+"Katipunan": [
+  "San Antonio Elementary School",
+  "Basketball Covered Court"
+],
+
+"Lourdes": [
+  "Basketball Covered Court"
+],
+
+"Maharlika": [
+  "PureGold Kanlaon",
+  "National Shrine of Our Lady of Lourdes"
+],
+
+"Manresa": [
+  "Basketball Covered Court",
+  "Playground"
+],
+
+"Mariblo": [
+  "Barangay Hall (Mariblo)",
+  "Day Care Center"
+],
+
+"Masambong": [
+  "Tennis Court",
+  "Gazebo Hall",
+  "Parking Space"
+],
+
+"Nayong Kanluran": [
+  "Nayong Kanluran Barangay Hall",
+  "Nayong Kanluran Covered Court"
+],
+
+"Paang Bundok": [
+  "Barangay Hall Paang Bundok",
+  "Open Space"
+],
+
+"Pag-ibig sa Nayon": [
+  "Barangay Covered Court",
+  "Yakap Day Care Center",
+  "San Jose Elementary School"
+],
+
+"Paltok": [
+  "Paltok Covered Court",
+  "Paltok Elementary School",
+  "Bayanihan Elementary School",
+  "Paltok Barangay Hall"
+],
+
+"Paraiso": [
+  "Residential House"
+],
+
+"Phil-Am": [
+  "Phil-Am Football Field"
+],
+
+"Project 6": [
+  "Veterans Covered Court",
+  "Project 6 Elementary School",
+  "Project 6 Park",
+  "Multipurpose Hall – 3rd Floor"
+],
+
+"Quirino 2-A": [
+  "Quirino 2A Multipurpose Hall"
+],
+
+"Quirino 2-B": [
+  "Quirino High School & Elementary School",
+  "Barangay Hall & Covered Court"
+],
+
+"Ramon Magsaysay": [
+  "Parking Space & 3rd Floor of Brgy",
+  "Covered Court"
+],
+
+"Salvacion": [
+  "Salvacion Barangay Hall"
+],
+
+"San Antonio": [
+  "San Antonio De Padua Parish Church",
+  "San Jose Covered Court"
+],
+
+"San Isidro Labrador": [
+  "San Isidro Labrador Barangay Hall"
+],
+
+"San Jose": [
+  "San Jose Elementary School",
+  "Basketball Covered Court"
+],
+
+"Siena": [
+  "Siena Barangay Hall (4th Floor)",
+  "Siena College of Quezon City (Open Space)"
+],
+
+"St. Peter": [
+  "Barangay Multipurpose Hall"
+],
+
+"Sta. Lucia": [
+  "Sta. Lucia Multipurpose Building",
+  "Sta. Lucia Covered Court"
+],
+
+"Sta. Cruz": [
+  "Barangay Multipurpose Hall",
+  "Day Care Center (3rd Floor)"
+],
+
+"Sta. Teresita": [
+  "Sta. Teresita Covered Court"
+],
+
+"Sto. Cristo": [
+  "Sto. Cristo Elementary School"
+],
+
+"Sto. Domingo": [
+  "The Santo Domingo Church and Convent"
+],
+
+"Sto. Niño": [
+  "Sto. Niño Barangay Hall"
+],
+
+"Talayan": [
+  "Talayan Village Park"
+],
+
+"Vasra": [
+  "Barangay Hall (3rd Floor)",
+  "VMMC Hospital Open Space"
+],
+
+"Veterans Village": [
+  "Esteban Abada Elementary School",
+  "Lucrecia Kasilag High School",
+  "Covered Court"
+],
+
+"West Triangle": [
+  "Barangay Hall Multipurpose Hall",
+  "Basketball Covered Court",
+  "Open Space (JASMS compound)"
+],
+
+/* ================= DISTRICT 2 ================= */
+
+"Bagong Silangan": [
+  "Evacuation Site",
+  "Bagong Silangan Elementary School",
+  "Bagong Silangan High School",
+  "Bona Multipurpose Hall",
+  "Brookside Evacuation Site",
+  "Clemencia Evacuation Center",
+  "Fil-Heights Club House",
+  "Humanity Ville Evacuation Center",
+  "Kawan Chapel",
+  "Lumang Palengke",
+  "Pocalari Evacuation Center",
+  "San Isidro Church",
+  "Scandinavian School Area 6"
+],
+
+"Batasan Hills": [
+  "Area A-3 Covered Court",
+  "Saret Covered Court",
+  "Freedom Park Covered Court",
+  "Batasan National High School",
+  "San Diego Elementary School",
+  "President Corazon Aquino Elementary School",
+  "Phase I Covered Court"
+],
+
+"Commonwealth": [
+  "BYC Covered Court",
+  "Soliven Covered Court",
+  "Kaunlaran Covered Court",
+  "MRB Covered Court"
+],
+
+"Holy Spirit": [
+  "Covered Court",
+  "Gilarmi Covered Court",
+  "Sto. Niño Covered Court",
+  "LRB Covered Court"
+],
+
+"Payatas": [
+  "Multi-Purpose Hall",
+  "Payatas Phase 2 Covered Court",
+  "Payatas Phase 4 Covered Court",
+  "Golden Shower Covered Court",
+  "Plaza Dos Covered Court",
+  "Bulacan St. Barangay Hall Covered Court",
+  "Payatas Livelihood Building",
+  "Talisay Covered Court"
+],
+
+/* ================= DISTRICT 3 ================= */
+
+"Amihan": [
+  "Open Space",
+  "Quirino High School"
+],
+
+"Bagumbayan": [
+  "Mangahan Fire Station – 2nd Floor",
+  "Multipurpose Sr. Hall",
+  "Bagumbayan Elementary School",
+  "Covered Court",
+  "Kalantiaw Elementary School"
+],
+
+"Blue Ridge A": [
+  "Tennis Court & Basketball Court",
+  "Parking Area in front of Barangay Hall"
+],
+
+"Blue Ridge B": [
+  "Barangay Hall"
+],
+
+"Camp Aguinaldo": [
+  "Open Space"
+],
+
+"Duyan-Duyan": [
+  "Covered Court",
+  "Project 3 Elementary School",
+  "High School"
+],
+
+"E. Rodriguez": [
+  "Carlos P. Garcia High School",
+  "E. Rodriguez Elementary School",
+  "Nativity of the Lord Parish Church",
+  "Cubao Elementary School"
+],
+
+"East Kamias": [
+  "Barangay Hall – 2nd & 3rd Floor",
+  "Multipurpose Hall",
+  "Open Space"
+],
+
+"Escopa 1": ["Mini Plaza"],
+"Escopa 2": ["Katipunan Avenue near QMMC"],
+"Escopa 3": ["NVRC"],
+"Escopa 4": ["Escopa 4 Multipurpose Hall"],
+
+"Libis": [
+  "Multi-Purpose Hall Covered Court",
+  "Open Space"
+],
+
+"Loyola Heights": [
+  "Covered Court",
+  "Multipurpose Hall"
+],
+
+"Marilag": [
+  "3rd Floor Barangay Hall & Event Place",
+  "National College of Business and Arts",
+  "T. Alonzo Elementary School"
+],
+
+"Masagana": [
+  "MTD & SB Building",
+  "Covered Court",
+  "Paciano Rizal Oval",
+  "Open Space"
+],
+
+"Matandang Balara": [
+  "Old Balara Elementary School",
+  "Tandang Sora Covered Court"
+],
+
+"Milagrosa": [
+  "5K Open Space"
+],
+
+"N.S. Amoranto": [
+  "E. Rodriguez Elementary School",
+  "Tennis Court",
+  "Basketball Court"
+],
+
+"Pansol": [
+  "Balara Elementary School",
+  "Balara High School",
+  "Kaingin I Covered Court",
+  "Kaingin II Covered Court"
+],
+
+"Quirino 3A": [
+  "Quirino 3A Barangay Hall",
+  "Open Space"
+],
+
+"Silangan": [
+  "Silangan Barangay Hall",
+  "Friendship Covered Court"
+],
+
+"Socorro": [
+  "Camp Aguinaldo",
+  "15th Elementary School Basketball Covered Court",
+  "SM Cubao Parking"
+],
+
+"St. Ignatius": [
+  "St. Ignatius Open Space"
+],
+
+"Tagumpay": ["Open Space"],
+
+"Ugong Norte": [
+  "Barangay Hall",
+  "Corinthian Garden Clubhouse",
+  "Arcadia Clubhouse",
+  "Open Space"
+],
+
+"Villa Maria Clara": [
+  "Open Space",
+  "Pelaez Park"
+],
+
+"West Kamias": [
+  "Multipurpose Hall"
+],
+
+"White Plains": [
+  "Tennis Court",
+  "Basketball Court"
+],
+
+/* ================= DISTRICT 4 ================= */
+
+"Bagong Lipunan ng Crame": [
+  "Open Court",
+  "Open Space"
+],
+
+"Botocan": [
+  "Botocan Barangay Hall – 3rd Floor",
+  "Suntay Multipurpose Building"
+],
+
+"Central": [
+  "Quezon Memorial Circle",
+  "Kalayaan Service Road",
+  "Suntay Multipurpose Building",
+  "Daza Hall",
+  "Orchids Covered Court"
+],
+
+"Damayang Lagi": [
+  "TUA Building",
+  "San Lorenzo"
+],
+
+"Doña Aurora": [
+  "Jacinto Basketball Covered Court",
+  "Barangay Hall",
+  "Our Lady of Sacred Heart School"
+],
+
+"Doña Imelda": [
+  "Multipurpose Hall Gymnasium",
+  "Malangen Hall",
+  "Suntay Amphitheater",
+  "Justice Hall"
+],
+
+"Kamuning": [
+  "Barangay Function Hall",
+  "KD Covered Court",
+  "Senior Building Hall",
+  "Vicente Hall",
+  "Suntay Multipurpose Hall"
+],
+
+"Kalusugan": [
+  "Kalusugan Barangay Hall",
+  "Multipurpose Building"
+],
+
+"Kristong Hari": [
+  "Marvin Rillo Multipurpose",
+  "Aray Building",
+  "Lagman Building"
+],
+
+"Krus na Ligas": [
+  "Baluyot Covered Court",
+  "Baluyot Multipurpose Building"
+],
+
+"Malaya": [
+  "Basketball Covered Court",
+  "Malaya Elementary School"
+],
+
+"Mariana": [
+  "National Shrine of Our Lady of Mt. Carmel"
+],
+
+"Obrero": [
+  "Don Alejandro Roces Sr. High School",
+  "Old Barangay Building"
+],
+
+"Old Capitol Site": [
+  "Basketball Covered Court",
+  "Open Space",
+  "Barangay Hall Annex"
+],
+
+"Roxas": [
+  "Roxas Multipurpose Gymnasium",
+  "Roxas Covered Court",
+  "Holy Family Parish Church"
+],
+
+"Sacred Heart": [
+  "Kamuning Elementary School",
+  "Sacred Heart Parish – Shrine"
+],
+
+"San Roque": [
+  "Aguinaldo Elementary School Covered Court",
+  "San Roque Barangay Hall (3rd Floor)"
+],
+
+"Sikatuna Village": [
+  "1st Quadrant",
+  "2nd Quadrant",
+  "3rd Quadrant",
+  "4th Quadrant"
+],
+
+"South Triangle": [
+  "South Triangle Barangay Hall"
+],
+
+"Tatalon": [
+  "Mabuhay Court",
+  "Diosdado Macapagal Elementary School Covered Court"
+],
+
+"Teachers Village East": [
+  "Teachers Village East Barangay Hall",
+  "C.P. Garcia Park"
+],
+
+"Teachers Village West": [
+  "Claret School of Quezon City"
+],
+
+"Valencia": [
+  "Valencia Barangay Hall",
+  "SK Hall",
+  "Open Court"
+],
+
+/* ================= DISTRICT 5 ================= */
+
+"Bagbag": [
+  "San Pedro Covered Court",
+  "SB Park Covered Court",
+  "St. Nicholas of Bari School",
+  "Remarville Covered Court"
+],
+
+"Capri": [
+  "Capri Activity Center",
+  "Covered Court"
+],
+
+"Fairview": [
+  "Fairlane Elementary School",
+  "The Church of Jesus Christ",
+  "Sitio Sto. Niño"
+],
+
+"Greater Lagro": [
+  "A. Centennial Park Dulo",
+  "B Plaza Gitna",
+  "C. Mindanao Ave. Ext Open Space",
+  "Fatima University Covered Court"
+],
+
+"Gulod": [
+  "Elementary School"
+],
+
+"Kaligayahan": [
+  "Zabarte Covered Court",
+  "Multipurpose Hall",
+  "Roxas Vargas Hall"
+],
+
+"Nagkaisang Nayon": [
+  "Banahaw St. Open Space",
+  "Pasacola Area D Basketball Covered Court",
+  "Goldmine Basketball Court",
+  "Robina Covered Court"
+],
+
+"North Fairview": [
+  "North Fairview Basketball Court"
+],
+
+"Novaliches Proper": [
+  "Barangay Hall – 3rd Floor",
+  "Vargas Building",
+  "Dona Isaura Covered Court",
+  "Dona Rosario Covered Court / Command Center",
+  "SB Plaza"
+],
+
+"Pasong Putik": [
+  "Feliciano Covered Court",
+  "Celpito Covered Court",
+  "Petchayang Covered Court"
+],
+
+"San Agustin": [
+  "Vargas Multi-Purpose Hall",
+  "T.S Park"
+],
+
+"San Bartolome": [
+  "California Village",
+  "Nomar II Covered Court",
+  "Odelco Covered Court",
+  "Odelco Elementary School"
+],
+
+"Sta. Monica": [
+  "Villaverde Covered Court",
+  "Santiago Subd Covered Court",
+  "Lydia Covered Court",
+  "Palmera Phase II Covered Court",
+  "Palmera Phase IV Covered Court"
+],
+
+/* ================= DISTRICT 6 ================= */
+
+"Apolonio Samson": [
+  "Apolonio Samson Elementary School"
+],
+
+"Baesa": [
+  "Covered Court Asamba",
+  "Monotoc Covered Court",
+  "Elementary School",
+  "Saint Martin De Porres Chapel",
+  "Dead End Court"
+],
+
+"Balong-Bato": [
+  "Balon-Bato Health Center",
+  "Balon-Bato Elementary School"
+],
+
+"Culiat": [
+  "Vargas Compound Covered Court",
+  "Multipurpose Hall",
+  "Culiat High School",
+  "Salam Covered Court",
+  "Bernardo Covered Court Multi-Purpose Hall",
+  "Pael Multipurpose Hall"
+],
+
+"New Era": [
+  "Disaster Building",
+  "MRF Building"
+],
+
+"Pasong Tamo": [
+  "Marcel Village Covered Court",
+  "Veteran Annex I",
+  "Pingkian / Central Annex II",
+  "Pantranco Chapel"
+],
+
+"Sangandaan": [
+  "Mendoza Multipurpose Building – 3rd Floor",
+  "Mathay High School"
+],
+
+"Sauyo": [
+  "Sotto Multipurpose Building",
+  "Sauyo Elementary School",
+  "Del Nacia Ville Covered Court",
+  "NIA Covered Court",
+  "Sauyo Covered Court"
+],
+
+"Talipapa": [
+  "Talipapa Barangay Hall – 3rd Floor",
+  "Placido del Mundo Elementary School",
+  "Villa Sabina Park",
+  "Volleyball Court",
+  "Silvina Village Sports Complex",
+  "Sahara Sports Complex Basketball Court"
+],
+
+"Tandang Sora": [
+  "Tandang Sora Barangay Hall",
+  "Tandang Sora Covered Court"
+],
+
+"Unang Sigaw": [
+  "Covered Court (Camachile Police Station 3 QCPD)"
+],
+
+"UP Campus": [
+  "Amorsolo Building",
+  "Village B Covered Court",
+  "Dagohoy Hall"
+],
+
+"UP Village": [
+  "Basketball Court",
+  "Tennis Court"
+]
+
+};
+
+const list=document.getElementById("facilityList");
+
+if(evacuationData[barangay]){
+
+evacuationData[barangay].forEach(place=>{
+
+const card=document.createElement("div");
+
+card.className="facility-card";
+
+card.innerHTML=`
+<h4>${place}</h4>
+<p>Evacuation Facility</p>
+`;
+
+list.appendChild(card);
+
+});
+
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Select Location – ReadyNow</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="sidebar">
+
+<div class="sidebar-logo">ReadyNow</div>
+
+<ul class="sidebar-menu">
+<li><a href="dashboard.html">Dashboard</a></li>
+<li><a href="selection.html">Select Location</a></li>
+<li><a href="map.html">Evacuation Information</a></li>
+<li><a href="map.html#weather">Weather Information</a></li>
+<li><a href="map.html#facilities">Evacuation Facilities</a></li>
+<li><a href="report.html">Report Disaster</a></li>
+<li><a href="about.html">About ReadyNow</a></li>
+</ul>
+
+</div>
+
+<div class="main-content">
+
+<header class="main-header">
+
+<div class="header-container">
+
+<button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+<div class="logo">ReadyNow</div>
+
+<nav>
+<a href="index.html">Home</a>
+<a href="about.html">About</a>
+</nav>
+
+</div>
+
+</header>
+<main class="page-container">
+
+<section class="hero">
+
+<h1>Select Your Location</h1>
+
+<p>
+Choose your district and barangay to view evacuation information.
+</p>
+
+</section>
+
+<div class="card">
+
+<label>District</label>
+<select id="districtSelect">
+<option value="">Choose District</option>
+<option>District 1</option>
+<option>District 2</option>
+<option>District 3</option>
+<option>District 4</option>
+<option>District 5</option>
+<option>District 6</option>
+</select>
+
+<label>Barangay</label>
+<select id="barangaySelect">
+<option value="">Choose Barangay</option>
+</select>
+
+<label>Search Barangay (if unsure)</label>
+<input type="text" id="searchInput" placeholder="Type barangay name...">
+
+<br><br>
+
+<button onclick="goToMap()">
+View Evacuation Map
+</button>
+
+</div>
+
+</main>
+
+<script>
+
+const barangayData = {
+
+"District 1": ["Alicia","Bagong Pag-asa","Bahay Toro","Balingasa","Bungad","Damar","Damayan","Del Monte","Katipunan","Lourdes","Maharlika","Manresa","Mariblo","Masambong","Nayong Kanluran","Paang Bundok","Pag-ibig sa Nayon","Paltok","Paraiso","Phil-Am","Project 6","Quirino 2-A","Quirino 2-B","Ramon Magsaysay","Salvacion","San Antonio","San Isidro Labrador","San Jose","Siena","St. Peter","Sta. Lucia","Sta. Cruz","Sta. Teresita","Sto. Cristo","Sto. Domingo","Sto. Niño","Talayan","Vasra","Veterans Village","West Triangle"],
+
+"District 2": ["Bagong Silangan","Batasan Hills","Commonwealth","Holy Spirit","Payatas"],
+
+"District 3": ["Amihan","Bagumbayan","Blue Ridge A","Blue Ridge B","Camp Aguinaldo","Dioquino Zobel","Don Manuel","Duyan-Duyan","E. Rodriguez","East Kamias","Escopa 1","Escopa 2","Escopa 3","Escopa 4","Libis","Loyola Heights","Mangga","Marilag","Masagana","Matandang Balara","Milagrosa","N.S. Amoranto","Pansol","Quirino 2C","Quirino 3A","Quirino 3B","Silangan","Socorro","St. Ignatius","Tagumpay","Ugong Norte","Villa Maria Clara","West Kamias","White Plains"],
+
+"District 4": ["Bagong Lipunan ng Crame","Botocan","Central","Damayang Lagi","Doña Aurora","Doña Imelda","Doña Josefa","Horseshoe","Immaculate Concepcion","Kamuning","Kalusugan","Kaunlaran","Kristong Hari","Krus na Ligas","Laging Handa","Malaya","Mariana","Obrero","Old Capitol Site","Paligsahan","Pinagkaisahan","Pinyahan","Roxas","Sacred Heart","San Isidro Galas","San Martin de Porres","San Roque","San Vicente","Santol","Sikatuna Village","South Triangle","Tatalon","Teachers Village East","Teachers Village West","Valencia"],
+
+"District 5": ["Bagbag","Capri","Fairview","Greater Lagro","Gulod","Kaligayahan","Nagkaisang Nayon","North Fairview","Novaliches Proper","Pasong Putik","San Agustin","San Bartolome","Sta. Monica"],
+
+"District 6": ["Apolonio Samson","Baesa","Balong-Bato","Culiat","New Era","Pasong Tamo","Sangandaan","Sauyo","Talipapa","Tandang Sora","Unang Sigaw","UP Campus","UP Village"]
+
+};
+
+document.getElementById("districtSelect").addEventListener("change", function() {
+  const district = this.value;
+  const select = document.getElementById("barangaySelect");
+  select.innerHTML = '<option value="">Choose Barangay</option>';
+
+  if (!district) return;
+
+  barangayData[district].sort().forEach(brgy => {
+    const option = document.createElement("option");
+    option.textContent = brgy;
+    select.appendChild(option);
+  });
+});
+
+document.getElementById("searchInput").addEventListener("input", function(){
+  const query = this.value.toLowerCase();
+  const district = document.getElementById("districtSelect").value;
+  if(!district) return;
+
+  const found = barangayData[district].find(b => b.toLowerCase().includes(query));
+  if(found){
+    document.getElementById("barangaySelect").value = found;
+  }
+});
+
+function goToMap(){
+  const district = document.getElementById("districtSelect").value;
+  const barangay = document.getElementById("barangaySelect").value;
+
+  if(!district || !barangay){
+    alert("Please select both District and Barangay.");
+    return;
+  }
+
+  window.location.href =
+    `map.html?district=${encodeURIComponent(district)}&barangay=${encodeURIComponent(barangay)}`;
+}
+
+</script>
+
+</body>
+</html>

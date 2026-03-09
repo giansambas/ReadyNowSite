@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>Report Disaster - ReadyNow</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar" id="sidebar">
+
+<div class="sidebar-header">
+<span class="sidebar-logo">ReadyNow</span>
+<button class="close-sidebar" onclick="toggleSidebar()">✕</button>
+</div>
+
+<ul class="sidebar-menu">
+
+<li><a href="dashboard.html">Dashboard</a></li>
+<li><a href="selection.html">Select Location</a></li>
+<li><a href="map.html">Evacuation Information</a></li>
+<li><a href="report.html">Report Disaster</a></li>
+<li><a href="about.html">About ReadyNow</a></li>
+
+</ul>
+
+</div>
+
+
+<!-- HEADER -->
+
+<header class="main-header">
+
+<button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+<div class="logo">ReadyNow</div>
+
+<nav>
+<a href="index.html">Home</a>
+<a href="about.html">About</a>
+</nav>
+
+</header>
+
+
+<!-- MAIN CONTENT -->
+
+<main class="page-container">
+
+<section class="hero">
+
+<h1>Report a Disaster</h1>
+
+<p>Help the community by reporting emergencies in your area.</p>
+
+</section>
+
+
+<div class="card">
+
+<label>Location</label>
+<input id="location" placeholder="Example: Batasan Hills, Quezon City">
+
+
+<label>Disaster Type</label>
+<select id="disaster">
+
+<option value="Flood">Flood</option>
+<option value="Fire">Fire</option>
+<option value="Landslide">Landslide</option>
+<option value="Earthquake">Earthquake</option>
+
+</select>
+
+
+<label>Description</label>
+<textarea id="description" rows="4" placeholder="Describe the situation..."></textarea>
+
+
+<button onclick="submitReport()">Submit Report</button>
+
+<p id="status" style="margin-top:10px;"></p>
+
+</div>
+
+</main>
+
+
+<footer>
+
+<p>ReadyNow © 2026</p>
+
+</footer>
+
+
+
+<script>
+
+/* SIDEBAR TOGGLE */
+
+function toggleSidebar(){
+document.getElementById("sidebar").classList.toggle("open");
+}
+
+
+
+/* SUBMIT REPORT */
+
+async function submitReport(){
+
+const location = document.getElementById("location").value;
+const disaster = document.getElementById("disaster").value;
+const description = document.getElementById("description").value;
+
+if(!location || !description){
+
+document.getElementById("status").innerText = "Please fill out all fields.";
+return;
+
+}
+
+try{
+
+const res = await fetch("/api/report",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+location,
+disaster,
+description
+})
+
+});
+
+const data = await res.json();
+
+document.getElementById("status").innerText = "Report submitted successfully!";
+
+document.getElementById("location").value="";
+document.getElementById("description").value="";
+
+}
+catch(error){
+
+document.getElementById("status").innerText = "Error submitting report.";
+
+}
+
+}
+
+</script>
+
+
+</body>
+</html>

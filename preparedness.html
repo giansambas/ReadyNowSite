@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preparedness Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<div class="sidebar-logo">ReadyNow</div>
+
+<ul class="sidebar-menu">
+<li><a href="dashboard.html">Dashboard</a></li>
+<li><a href="selection.html">Select Location</a></li>
+<li><a href="map.html">Evacuation Information</a></li>
+<li><a href="map.html#weather">Weather Information</a></li>
+<li><a href="map.html#facilities">Evacuation Facilities</a></li>
+<li><a href="report.html">Report Disaster</a></li>
+<li><a href="about.html">About ReadyNow</a></li>
+</ul>
+
+</div>
+
+<header class="main-header">
+
+<div class="header-container">
+
+<button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+<div class="logo">ReadyNow</div>
+
+<nav>
+<a href="index.html">Home</a>
+<a href="about.html">About</a>
+</nav>
+
+</div>
+
+</header>
+
+<main class="page-container">
+
+<section class="hero">
+<h1>Preparedness Guide</h1>
+<p>Location: <strong>Quezon City</strong></p>
+</section>
+
+<div class="card">
+<h3>Official Guidance</h3>
+<p id="ai-output">Loading guidance...</p>
+</div>
+
+<div class="card">
+<h3>Current Weather</h3>
+<p id="weather-prep">Loading weather data...</p>
+</div>
+
+<a href="selection.html">
+<button>Select Barangay & View Map</button>
+</a>
+
+</main>
+
+<footer>
+<p>ReadyNow © 2026</p>
+</footer>
+
+</div>
+
+<script>
+
+const params = new URLSearchParams(window.location.search);
+const disaster = params.get("disaster");
+
+let guidance = "General preparedness guidance from QC DRRMO.";
+
+if (disaster === "typhoon"){
+guidance="Monitor weather updates. Prepare Go Bag. Evacuate when advised by QC DRRMO.";
+}
+else if (disaster === "earthquake"){
+guidance="Duck, Cover, and Hold. Stay away from windows. Evacuate to designated areas.";
+}
+else if (disaster === "flood"){
+guidance="Move to higher ground. Avoid flooded roads. Follow LGU evacuation advisories.";
+}
+else if (disaster === "fire"){
+guidance="Evacuate immediately. Do not use elevators. Contact emergency hotlines.";
+}
+else if (disaster === "landslide"){
+guidance="Evacuate to safer grounds. Monitor warnings. Avoid landslide-prone areas.";
+}
+
+document.getElementById("ai-output").innerText=guidance;
+
+fetch(`https://api.openweathermap.org/data/2.5/weather?q=Quezon City,PH&units=metric&appid=585f6af2cbff1e00738777e8c9af0136`)
+.then(res=>res.json())
+.then(data=>{
+
+if(data.main){
+document.getElementById("weather-prep").innerText=
+`Temperature: ${data.main.temp}°C | Condition: ${data.weather[0].description}`;
+}
+
+})
+.catch(()=>{
+document.getElementById("weather-prep").innerText="Unable to load weather data.";
+});
+
+</script>
+
+</body>
+</html>
