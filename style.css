@@ -707,3 +707,25 @@ grid-template-columns:1fr;
 }
 
 }
+
+/* Report description textbox */
+
+.report-textarea{
+width:100%;
+min-height:100px;
+padding:14px;
+font-size:14px;
+font-family:inherit;
+border:1px solid #ddd;
+border-radius:10px;
+resize:vertical;
+outline:none;
+background:#fafafa;
+transition:all .2s ease;
+}
+
+.report-textarea:focus{
+border-color:#b23a3a;
+box-shadow:0 0 0 3px rgba(178,58,58,.15);
+background:white;
+}
